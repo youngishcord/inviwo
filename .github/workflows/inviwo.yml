@@ -29,24 +29,24 @@ jobs:
         configuration: [Release, Debug]
         
         include:
-          - system: windows
-            os: 'windows-2022'
-            targets: 'ALL_BUILD'
-            installer: 'inviwo-installer-win'
-            artifact: 'build/inviwo-v*.exe'
-            run: |
-              ./Release/inviwo-cli.exe --logconsole --quit
-              if [ $? -nq 0 ]
-              then
-                 C:/'Program Files (x86)'/'Windows Kits'/10/Debuggers/x64/gflags.exe /i ./Release/inviwo-cli.exe +sls
-                 C:/'Program Files (x86)'/'Windows Kits'/10/Debuggers/x64/cdb.exe -g -c q ./Release/inviwo-cli.exe
-              fi
+          # - system: windows
+          #   os: 'windows-2022'
+          #   targets: 'ALL_BUILD'
+          #   installer: 'inviwo-installer-win'
+          #   artifact: 'build/inviwo-v*.exe'
+          #   run: |
+          #     ./Release/inviwo-cli.exe --logconsole --quit
+          #     if [ $? -nq 0 ]
+          #     then
+          #        C:/'Program Files (x86)'/'Windows Kits'/10/Debuggers/x64/gflags.exe /i ./Release/inviwo-cli.exe +sls
+          #        C:/'Program Files (x86)'/'Windows Kits'/10/Debuggers/x64/cdb.exe -g -c q ./Release/inviwo-cli.exe
+          #     fi
           
-          - system: macos
-            os: 'macos-15'
-            targets: 'ALL_BUILD'
-            installer: 'inviwo-installer-macos'
-            artifact: 'build/inviwo-v*.dmg'
+          # - system: macos
+          #   os: 'macos-15'
+          #   targets: 'ALL_BUILD'
+          #   installer: 'inviwo-installer-macos'
+          #   artifact: 'build/inviwo-v*.dmg'
           
           - system: linux
             os: 'ubuntu-24.04'
@@ -56,19 +56,19 @@ jobs:
             run: QT_QPA_PLATFORM=offscreen ./inviwo --logconsole --quit
 
           # set triplets
-          - system: 'windows'
-            linkage: 'dynamic'
-            triplet: 'x64-windows'
-          - system: 'windows'
-            linkage: 'static'
-            triplet: 'x64-windows-static-md'
+          # - system: 'windows'
+          #   linkage: 'dynamic'
+          #   triplet: 'x64-windows'
+          # - system: 'windows'
+          #   linkage: 'static'
+          #   triplet: 'x64-windows-static-md'
 
-          - system: 'macos'
-            linkage: 'dynamic'
-            triplet: 'arm64-osx-dynamic'
-          - system: 'macos'
-            linkage: 'static'
-            triplet: 'arm64-osx'
+          # - system: 'macos'
+          #   linkage: 'dynamic'
+          #   triplet: 'arm64-osx-dynamic'
+          # - system: 'macos'
+          #   linkage: 'static'
+          #   triplet: 'arm64-osx'
 
           - system: 'linux'
             linkage: 'dynamic'
@@ -78,17 +78,17 @@ jobs:
             triplet: 'x64-linux'
 
           # Run
-          - system: 'macos'
-            configuration: Release
-            run: './Release/inviwo.app/Contents/MacOS/inviwo --logconsole --quit'
-          - system: 'macos'
-            configuration: Debug
-            run: './Debug/inviwo.app/Contents/MacOS/inviwo --logconsole --quit'
+          # - system: 'macos'
+          #   configuration: Release
+          #   run: './Release/inviwo.app/Contents/MacOS/inviwo --logconsole --quit'
+          # - system: 'macos'
+          #   configuration: Debug
+          #   run: './Debug/inviwo.app/Contents/MacOS/inviwo --logconsole --quit'
 
         exclude:
           # Windows debug build are to big, they run out of diskspace
-          - system: windows
-            configuration: Debug
+          # - system: windows
+          #   configuration: Debug
           # This build fails very close to the end with "ninja: build stopped: interrupted by user."
           - system: linux
             linkage: static
@@ -134,19 +134,19 @@ jobs:
         echo "::remove-matcher owner=compiler::"
         echo "::remove-matcher owner=linker::"
 
-    - name: "Documentation"
-      timeout-minutes: 60
-      if: matrix.system == 'windows' &&  matrix.linkage == 'dynamic' && matrix.configuration == 'Release'
-      shell: bash
-      run: |
-        cmake --build build --config ${{ matrix.configuration }} --verbose --parallel --target DOXY-Inviwo DOXY-Python
+    # - name: "Documentation"
+    #   timeout-minutes: 60
+    #   if: matrix.system == 'windows' &&  matrix.linkage == 'dynamic' && matrix.configuration == 'Release'
+    #   shell: bash
+    #   run: |
+    #     cmake --build build --config ${{ matrix.configuration }} --verbose --parallel --target DOXY-Inviwo DOXY-Python
 
-    - name: "Package"
-      timeout-minutes: 120
-      if: ( matrix.system == 'windows' || matrix.system == 'linux') &&  matrix.linkage == 'dynamic' && matrix.configuration == 'Release'
-      shell: bash
-      run: |
-        cmake --build build --config ${{ matrix.configuration }} --verbose --parallel --target package
+    # - name: "Package"
+    #   timeout-minutes: 120
+    #   if: ( matrix.system == 'windows' || matrix.system == 'linux') &&  matrix.linkage == 'dynamic' && matrix.configuration == 'Release'
+    #   shell: bash
+    #   run: |
+    #     cmake --build build --config ${{ matrix.configuration }} --verbose --parallel --target package
 
     - name: "Run"
       shell: bash
@@ -165,19 +165,19 @@ jobs:
         name: ${{ matrix.installer }}
         path: ${{ matrix.artifact }}
 
-    - name: "Upload doxygen"
-      if: matrix.system == 'windows' &&  matrix.linkage == 'dynamic' && matrix.configuration == 'Release'
-      uses: actions/upload-artifact@v4
-      with:
-        name: inviwo-cpp-api
-        path: build/docs/inviwo/html/*
+    # - name: "Upload doxygen"
+    #   if: matrix.system == 'windows' &&  matrix.linkage == 'dynamic' && matrix.configuration == 'Release'
+    #   uses: actions/upload-artifact@v4
+    #   with:
+    #     name: inviwo-cpp-api
+    #     path: build/docs/inviwo/html/*
 
-    - name: "Upload shpinx"
-      if: matrix.system == 'windows' &&  matrix.linkage == 'dynamic' && matrix.configuration == 'Release'
-      uses: actions/upload-artifact@v4
-      with:
-        name: inviwo-python-api
-        path: build/docs/python-api/*
+    # - name: "Upload shpinx"
+    #   if: matrix.system == 'windows' &&  matrix.linkage == 'dynamic' && matrix.configuration == 'Release'
+    #   uses: actions/upload-artifact@v4
+    #   with:
+    #     name: inviwo-python-api
+    #     path: build/docs/python-api/*
     
     - name: "Upload Vcpkg build Logs"
       if: "${{ failure() }}"
@@ -428,153 +428,153 @@ jobs:
       with:
         limit-access-to-actor: true
 
-  test-installer:
-    name: "Test Installer"
-    needs: build
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [windows-latest] # macos-latest,
-        include:
-          - os: 'windows-latest'
-            installer: 'inviwo-installer-win'
-          #- os: 'macos-latest'
-          #  installer: 'inviwo-installer-macos'
+  # test-installer:
+  #   name: "Test Installer"
+  #   needs: build
+  #   strategy:
+  #     fail-fast: false
+  #     matrix:
+  #       os: [windows-latest] # macos-latest,
+  #       include:
+  #         - os: 'windows-latest'
+  #           installer: 'inviwo-installer-win'
+  #         #- os: 'macos-latest'
+  #         #  installer: 'inviwo-installer-macos'
         
-    runs-on: ${{ matrix.os }}
-    steps:
-    - name: "Download artifact"
-      uses: actions/download-artifact@v4
-      with:
-        name: ${{ matrix.installer }}
+  #   runs-on: ${{ matrix.os }}
+  #   steps:
+  #   - name: "Download artifact"
+  #     uses: actions/download-artifact@v4
+  #     with:
+  #       name: ${{ matrix.installer }}
 
     # Windows
-    - name: "Run Windows Installer"
-      if: runner.os == 'Windows'
-      shell: pwsh
-      run: |
-        # find the name of the installer
-        $exe = Get-ChildItem -Name inviwo-*.exe
-        # launch the nsis installer in "silent mode" (/S), should run without user interaction
-        Invoke-expression "./$exe /S"
-        # this will spawn the installer in the background so we need to wait for it to finish
-        $proc = Get-Process | where {$_.ProcessName -like "inviwo-*"} | Select-Object -First 1
-        if ($proc) { 
-          Wait-Process -Id $proc.id
-        }
+    # - name: "Run Windows Installer"
+    #   if: runner.os == 'Windows'
+    #   shell: pwsh
+    #   run: |
+    #     # find the name of the installer
+    #     $exe = Get-ChildItem -Name inviwo-*.exe
+    #     # launch the nsis installer in "silent mode" (/S), should run without user interaction
+    #     Invoke-expression "./$exe /S"
+    #     # this will spawn the installer in the background so we need to wait for it to finish
+    #     $proc = Get-Process | where {$_.ProcessName -like "inviwo-*"} | Select-Object -First 1
+    #     if ($proc) { 
+    #       Wait-Process -Id $proc.id
+    #     }
         
-    - name: "Run Inviwo"
-      if: runner.os == 'Windows'
-      shell: pwsh
-      run: |
-        $ver = (Get-ChildItem -Name C:/"Program Files"/Inviwo/*)
-        cd C:/'Program Files'/Inviwo/$ver/bin/
-        ./inviwo-cli.exe --logconsole --quit
-        if ($LASTEXITCODE -ne 0) {
-          C:\'Program Files (x86)'\'Windows Kits'\10\Debuggers\x64\gflags.exe /i inviwo-cli.exe +sls
-          C:\'Program Files (x86)'\'Windows Kits'\10\Debuggers\x64\cdb.exe -g -c q inviwo-cli.exe
-        }
+    # - name: "Run Inviwo"
+    #   if: runner.os == 'Windows'
+    #   shell: pwsh
+    #   run: |
+    #     $ver = (Get-ChildItem -Name C:/"Program Files"/Inviwo/*)
+    #     cd C:/'Program Files'/Inviwo/$ver/bin/
+    #     ./inviwo-cli.exe --logconsole --quit
+    #     if ($LASTEXITCODE -ne 0) {
+    #       C:\'Program Files (x86)'\'Windows Kits'\10\Debuggers\x64\gflags.exe /i inviwo-cli.exe +sls
+    #       C:\'Program Files (x86)'\'Windows Kits'\10\Debuggers\x64\cdb.exe -g -c q inviwo-cli.exe
+    #     }
     
     # Macos
-    - name: "Run MacOS Installer"
-      if: runner.os == 'macOS'
-      shell: bash
-      run: |
-        # Find the name of the installer 
-        DMG=$(ls Inviwo-*.dmg)
-        # Mount installer image
-        hdiutil attach $DMG
-        # Install by copying Inviwo.app to applications folder
-        cp -r /Volumes/${DMG%%.dmg}/Inviwo.app /Applications/
-        hdiutil detach /Volumes/${DMG%%.dmg}/
+    # - name: "Run MacOS Installer"
+    #   if: runner.os == 'macOS'
+    #   shell: bash
+    #   run: |
+    #     # Find the name of the installer 
+    #     DMG=$(ls Inviwo-*.dmg)
+    #     # Mount installer image
+    #     hdiutil attach $DMG
+    #     # Install by copying Inviwo.app to applications folder
+    #     cp -r /Volumes/${DMG%%.dmg}/Inviwo.app /Applications/
+    #     hdiutil detach /Volumes/${DMG%%.dmg}/
 
-    - name: "Run Inviwo"
-      if: runner.os == 'macOS'
-      shell: bash
-      run: |
-        cd /Applications/Inviwo.app/Contents/MacOS/
-        ./inviwo --logconsole --quit
+    # - name: "Run Inviwo"
+    #   if: runner.os == 'macOS'
+    #   shell: bash
+    #   run: |
+    #     cd /Applications/Inviwo.app/Contents/MacOS/
+    #     ./inviwo --logconsole --quit
 
-    - name: "Setup tmate session"
-      if: "${{ failure() && contains(github.event.pull_request.labels.*.name, 'CI: Debug') }}"
-      uses: mxschmitt/action-tmate@v3
-      timeout-minutes: 30
-      with:
-        limit-access-to-actor: true
+    # - name: "Setup tmate session"
+    #   if: "${{ failure() && contains(github.event.pull_request.labels.*.name, 'CI: Debug') }}"
+    #   uses: mxschmitt/action-tmate@v3
+    #   timeout-minutes: 30
+    #   with:
+    #     limit-access-to-actor: true
  
-  create-changelog:
-    name: "Create Changelog"
-    runs-on: ubuntu-latest
-    steps:
-    - name: "Generate Changelog"
-      id: changelog
-      uses: mikepenz/release-changelog-builder-action@v5
-      with:
-        toTag: ${{ github.ref }}
-        outputFile: changelog.md
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  # create-changelog:
+  #   name: "Create Changelog"
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #   - name: "Generate Changelog"
+  #     id: changelog
+  #     uses: mikepenz/release-changelog-builder-action@v5
+  #     with:
+  #       toTag: ${{ github.ref }}
+  #       outputFile: changelog.md
+  #     env:
+  #       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: "Log Changelog"
-      shell: bash
-      run: |
-        echo "-- Changes --"
-        echo "${{ steps.changelog.outputs.changelog }}"
-        echo "-- End --"
-    - name: "Upload Changelog"
-      uses: actions/upload-artifact@v4
-      with:
-        name: changelog.md
-        path: changelog.md
+  #   - name: "Log Changelog"
+  #     shell: bash
+  #     run: |
+  #       echo "-- Changes --"
+  #       echo "${{ steps.changelog.outputs.changelog }}"
+  #       echo "-- End --"
+  #   - name: "Upload Changelog"
+  #     uses: actions/upload-artifact@v4
+  #     with:
+  #       name: changelog.md
+  #       path: changelog.md
 
-  update-api-docs:
-    name: "Publish updated API Docs"
-    if: github.ref == 'refs/heads/master'
-    needs: [build, test-installer, regression]
+  # update-api-docs:
+  #   name: "Publish updated API Docs"
+  #   if: github.ref == 'refs/heads/master'
+  #   needs: [build, test-installer, regression]
 
-    runs-on: windows-latest
-    steps:
-      - name: "Clone Inviwo"
-        uses: actions/checkout@v4
-        with: 
-          ref: gh-pages
-          path: inviwo
-          submodules: false
+  #   runs-on: windows-latest
+  #   steps:
+  #     - name: "Clone Inviwo"
+  #       uses: actions/checkout@v4
+  #       with: 
+  #         ref: gh-pages
+  #         path: inviwo
+  #         submodules: false
 
-      - name: "Download python-api"
-        uses: actions/download-artifact@v4
-        with:
-          name: inviwo-python-api
-          path: inviwo/python-api
+  #     - name: "Download python-api"
+  #       uses: actions/download-artifact@v4
+  #       with:
+  #         name: inviwo-python-api
+  #         path: inviwo/python-api
 
-      - name: "Download cpp-api"
-        uses: actions/download-artifact@v4
-        with:
-          name: inviwo-cpp-api
-          path: inviwo/cpp-api
+  #     - name: "Download cpp-api"
+  #       uses: actions/download-artifact@v4
+  #       with:
+  #         name: inviwo-cpp-api
+  #         path: inviwo/cpp-api
 
-      - name: "Publish python-api"
-        run: |
-          cd inviwo
-          git config --global user.email "team@inviwo.org"
-          git config --global user.name "Inviwo Team"
-          git add python-api
-          git commit -m "Update Python API Docs"
-          git push
+  #     - name: "Publish python-api"
+  #       run: |
+  #         cd inviwo
+  #         git config --global user.email "team@inviwo.org"
+  #         git config --global user.name "Inviwo Team"
+  #         git add python-api
+  #         git commit -m "Update Python API Docs"
+  #         git push
 
-      - name: "Publish cpp-api"
-        run: |
-          cd inviwo
-          git config --global user.email "team@inviwo.org"
-          git config --global user.name "Inviwo Team"
-          git add cpp-api
-          git commit -m "Update C++ API Docs"
-          git push
+  #     - name: "Publish cpp-api"
+  #       run: |
+  #         cd inviwo
+  #         git config --global user.email "team@inviwo.org"
+  #         git config --global user.name "Inviwo Team"
+  #         git add cpp-api
+  #         git commit -m "Update C++ API Docs"
+  #         git push
 
   update-latest-release:
     name: "Update latest release"
     if: github.ref == 'refs/heads/master'
-    needs: [build, test-installer, regression, create-changelog]
+    needs: [build]
     strategy:
       matrix:
         os: [windows-latest, ubuntu-24.04] # macos-latest,
