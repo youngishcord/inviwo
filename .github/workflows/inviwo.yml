@@ -577,10 +577,12 @@ jobs:
     needs: [build, test-installer, regression, create-changelog]
     strategy:
       matrix:
-        os: [windows-latest] # macos-latest,
+        os: [windows-latest, ubuntu-24.04] # macos-latest,
         include:
           - os: 'windows-latest'
             installer: 'inviwo-installer-win'
+          - os: 'ubuntu-24.04'
+            installer: 'ubuntu-test'
           #- os: 'macos-latest'
           #  installer: 'inviwo-installer-macos'
     runs-on: ${{ matrix.os }}
